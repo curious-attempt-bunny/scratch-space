@@ -15,7 +15,7 @@
 (defn radians [degrees] (Math/toRadians degrees))
 
 (defmacro with-g2d-clone [& body]
-  "Executes its body using a cloned g2d which is then disposted and discarded."
+  "Executes its body using a cloned g2d which is then disposed and discarded."
   `(binding [g2d (.create g2d)]
      ~@body
      (.dispose g2d)))
@@ -38,14 +38,13 @@
   (System/currentTimeMillis))
 
 (def #^{:doc "Number of frames used to calculate FPS."} 
-     fps-window 10)
+     fps-window 20)
 
 (defn draw-fps
   "Draws the FPS."
   [timestamps]
-  ;(println timestamps)
   (if (= fps-window (count timestamps))
-    (let [ellapsedMillis (- (nth timestamps 0) (nth timestamps (dec fps-window)))
+    (let [ellapsedMillis (- (first timestamps) (nth timestamps (dec fps-window)))
 	  millisPerFrame (/ ellapsedMillis fps-window)
 	  secsPerFrame (/ millisPerFrame 1000)
 	  fps (/ 1 secsPerFrame)
@@ -81,14 +80,14 @@
 (defn run-render-window [width height renderfn]
   "Creates a window then continuously draws new frames, delegating to the render function to draw each frame."
   (let [canvas (Canvas.)
-	conf (.. GraphicsEnvironment (getLocalGraphicsEnvironment)
-                  (getDefaultScreenDevice) (getDefaultConfiguration))
+	conf (.. GraphicsEnvironment getLocalGraphicsEnvironment
+                  getDefaultScreenDevice getDefaultConfiguration)
         frame (JFrame. conf)
-        startTime (System/currentTimeMillis)]
+        startTime (now)]
 
     (.setSize canvas width height)
     (.setDefaultCloseOperation frame WindowConstants/EXIT_ON_CLOSE)
-    (.. frame (getContentPane) (add canvas))
+    (.. frame getContentPane (add canvas))
 
     (doto frame .pack .show)
 
@@ -99,6 +98,8 @@
     (render-loop canvas width height renderfn)))
 
 ; -- API END --
+
+; -- CLIENT CODE START --
 
 ; Playing around with varying the angles, however it doesn't look very good
 ; because each frame is different from any prior frame, so it's jumpy
@@ -111,7 +112,6 @@
 	new-angle (+ branch-angle delta)]
     (max min-angle (min max-angle new-angle))))
 
-; -- CLIENT CODE START --
 (defn drawTree [length depth branch-angle branch-deltafn]
   (if (> depth 0)  (do
       (.drawLine g2d 0 0 length 0)
