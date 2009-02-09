@@ -1,5 +1,3 @@
-; -- API START --
-
 (ns nuttyprofessors.clojure.graphics
   (:import (java.awt Canvas Color GraphicsEnvironment Graphics2D)
 	   (javax.swing JFrame WindowConstants)))
@@ -32,7 +30,7 @@
      (.translate g2d ~dx ~dy)
      ~@body))
 
-(defn now
+(defn- now
   "Current time in milliseconds."
   []
   (System/currentTimeMillis))
@@ -40,7 +38,7 @@
 (def #^{:doc "Number of frames used to calculate FPS."} 
      fps-window 20)
 
-(defn draw-fps
+(defn- draw-fps
   "Draws the FPS."
   [timestamps]
   (if (= fps-window (count timestamps))
@@ -52,7 +50,7 @@
       (.setColor g2d Color/BLUE)
       (.drawString g2d string 0 (.. g2d (getFontMetrics) (getMaxAscent))))))
     
-(defn render-loop 
+(defn- render-loop 
   "Endless loop for invoking the renderfn."
   [canvas width height renderfn]
   (let [bufferStrategy (.getBufferStrategy canvas)
@@ -78,7 +76,9 @@
 	(recur (take fps-window (cons (now) timestamps))))))
 
 (defn run-render-window [width height renderfn]
-  "Creates a window then continuously draws new frames, delegating to the render function to draw each frame."
+  "Creates a window then continuously draws new frames, delegating to the render function to 
+draw each frame. The renderfn takes no arguments, but can access the g2d Var (which contains
+the Graphics2D needed to draw)."
   (let [canvas (Canvas.)
 	conf (.. GraphicsEnvironment getLocalGraphicsEnvironment
                   getDefaultScreenDevice getDefaultConfiguration)
