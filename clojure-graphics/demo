@@ -1,0 +1,4 @@
+#!/bin/sh
+# Quick script to run the demo
+
+java -cp .:/usr/local/clojure/clojure.jar clojure.main demo.clj
